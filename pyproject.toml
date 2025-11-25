@@ -183,7 +183,7 @@ dependencies = [
     "psycopg[binary]==3.2.11",
     "pymongo>=4.15.3",
     "python-slugify==8.0.4",
-    "redis==6.4.0",
+    "redis==7.1.0",
     "twilio>=9.8.5",
     "whitenoise==6.11.0",
 ]

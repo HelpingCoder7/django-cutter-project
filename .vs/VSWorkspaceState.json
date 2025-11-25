@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\compose\\local",
+    "\\config",
+    "\\config\\settings",
+    "\\safetyappbackend\\templates",
+    "\\safetyappbackend\\templates\\account",
+    "\\safetyappbackend\\templates\\allauth",
+    "\\safetyappbackend\\templates\\pages",
+    "\\safetyappbackend\\templates\\users",
+    "\\serverenv"
+  ],
+  "SelectedNode": "\\config\\urls.py",
+  "PreviewInSolutionExplorer": false
+}

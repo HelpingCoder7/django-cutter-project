@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=safetyappbackend
+POSTGRES_USER=LOmqcwNaiiuvGLgFsYLjFsVtsmutUmDu
+POSTGRES_PASSWORD=leaE7dEJI3Gtv6GTcu7MiZtJR4uqcB9XkzlvAaqovUKqMNXe3jNyngxuQTklNTQB

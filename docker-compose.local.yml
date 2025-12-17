@@ -2,6 +2,7 @@ volumes:
   safetyappbackend_local_postgres_data: {}
   safetyappbackend_local_postgres_data_backups: {}
   safetyappbackend_local_redis_data: {}
+  safetyappbackend_local_mongodb_data: {}
 
 services:
   django: &django
@@ -13,6 +14,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - mongodb
     volumes:
       - /app/.venv
       - .:/app:z
@@ -40,6 +42,14 @@ services:
     container_name: safetyappbackend_local_redis
     volumes:
       - safetyappbackend_local_redis_data:/data
+
+  mongodb:
+    image: mongo:latest
+    container_name: safetyappbackend_local_mongodb
+    volumes:
+      - safetyappbackend_local_mongodb_data:/data/db
+    ports:
+      - '27017:27017'
 
   celeryworker:
     <<: *django

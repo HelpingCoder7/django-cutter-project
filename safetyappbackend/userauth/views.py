@@ -9,18 +9,16 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from twilio.rest import Client
+from django.core.cache import cache
 
 from .models import user_collection
 from .serializer import SignupSerializer
 
-
 # Create your views here.
-@api_view(["get"])
-def home(request):
-    return Response("Women are safe")
 
 
 class AUTHVIEWSET(viewsets.ViewSet):
+    
     @action(detail=False, methods=["Post"])
     def signupview(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -37,14 +35,21 @@ class AUTHVIEWSET(viewsets.ViewSet):
                 },
             )
         return Response({"msg": "something went wrong"})
+    
+    
 
-    @action(detail=False, methods=["Post"])
+    @action(detail=False, methods=["POST"])
     def loginview(self, request):
+
         phone_number = request.data.get("phone_number")
         password = request.data.get("password")
 
-        if phone_number is None or password is None:
-            return Response({"msg": phone_number})
+        if not phone_number or not password:
+            return Response(
+                {"error": "Phone number and password are required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         try:
             phone = int(phone_number)
         except (ValueError, TypeError):
@@ -53,34 +58,56 @@ class AUTHVIEWSET(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        cache_key = f"user:{phone_number}:password"
+
+        cached_password = cache.get(cache_key)
+        if cached_password:
+            if check_password(password, cached_password):
+                return Response(
+                    {
+                        "message": "Login successful (from cache)",
+                        "user": {"phone_number": phone_number},
+                    },
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"password": "Incorrect password"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+
         user = user_collection.find_one({"phone_number": phone})
         if not user:
             return Response(
-                {"error": f"User not found: {phone}"},
+                {"error": "User not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if not check_password(password, user.get("password", "")):
-            return Response({"error"})
+            return Response(
+                {"password": "Incorrect password"},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        cache.set(cache_key, user.get("password", ""), timeout=300)
 
         user_obj = type("UserObj", (), {"id": str(user["_id"])})()
-        token = RefreshToken.for_user(user_obj)
-
         refresh = RefreshToken.for_user(user_obj)
 
         return Response(
             {
-                "message": "Login successful",
+                "message": "Login successful (from DB)",
                 "user": {
                     "id": str(user["_id"]),
                     "phone_number": user["phone_number"],
                 },
                 "refresh": str(refresh),
                 "access": str(refresh.access_token),
-                "token": str(token),
             },
             status=status.HTTP_200_OK,
         )
+
+        
 
     def provide_otp(self, request):
         data = request.data

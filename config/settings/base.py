@@ -320,3 +320,14 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    },
+}
+
+MONGO_URI = env("MONGO_URI")
+MONGO_COLLECTION_NAME = env("MONGO_COLLECTION_NAME")
+MONGO_DB_NAME = env("MONGO_DB_NAME")

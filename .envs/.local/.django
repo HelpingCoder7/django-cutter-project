@@ -12,3 +12,7 @@ REDIS_URL=redis://redis:6379/0
 # Flower
 CELERY_FLOWER_USER=HkIRPnmijKoEqFJcGYdEVYAaCZKOROTO
 CELERY_FLOWER_PASSWORD=oDFi9lqconQS9Ww192dBV58I8O6vEkNTrp3yvxRCBm5fAlIaiGRSJtA7CnViVodH
+
+MONGO_URI=mongodb+srv://safetyapp:li7CIGUIiBZCJAvT@cluster0.nu2zdsi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+MONGO_DB_NAME=database
+MONGO_COLLECTION_NAME=logincollection

@@ -2,6 +2,7 @@ import secrets
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -9,7 +10,6 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from twilio.rest import Client
-from django.core.cache import cache
 
 from .models import user_collection
 from .serializer import SignupSerializer
@@ -18,7 +18,6 @@ from .serializer import SignupSerializer
 
 
 class AUTHVIEWSET(viewsets.ViewSet):
-    
     @action(detail=False, methods=["Post"])
     def signupview(self, request):
         serializer = SignupSerializer(data=request.data)
@@ -35,79 +34,75 @@ class AUTHVIEWSET(viewsets.ViewSet):
                 },
             )
         return Response({"msg": "something went wrong"})
-    
-    
 
     @action(detail=False, methods=["POST"])
     def loginview(self, request):
-
         phone_number = request.data.get("phone_number")
         password = request.data.get("password")
 
+        error = None
+        status_code = status.HTTP_400_BAD_REQUEST
+        response_data = None
+
         if not phone_number or not password:
-            return Response(
-                {"error": "Phone number and password are required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            error = "Phone number and password are required"
 
-        try:
-            phone = int(phone_number)
-        except (ValueError, TypeError):
-            return Response(
-                {"error": "Invalid phone number format"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        cache_key = f"user:{phone_number}:password"
-
-        cached_password = cache.get(cache_key)
-        if cached_password:
-            if check_password(password, cached_password):
-                return Response(
-                    {
-                        "message": "Login successful (from cache)",
-                        "user": {"phone_number": phone_number},
-                    },
-                    status=status.HTTP_200_OK,
-                )
+        else:
+            try:
+                phone = int(phone_number)
+            except (ValueError, TypeError):
+                error = "Invalid phone number format"
             else:
-                return Response(
-                    {"password": "Incorrect password"},
-                    status=status.HTTP_401_UNAUTHORIZED,
-                )
+                cache_key = f"user:{phone_number}:password"
+                cached_password = cache.get(cache_key)
 
-        user = user_collection.find_one({"phone_number": phone})
-        if not user:
-            return Response(
-                {"error": "User not found"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+                if cached_password:
+                    if check_password(password, cached_password):
+                        response_data = {
+                            "message": "Login successful (from cache)",
+                            "user": {"phone_number": phone_number},
+                        }
+                        status_code = status.HTTP_200_OK
+                    else:
+                        error = "Incorrect password"
+                        status_code = status.HTTP_401_UNAUTHORIZED
+                else:
+                    user = user_collection.find_one({"phone_number": phone})
+                    if not user:
+                        error = "User not found"
+                        status_code = status.HTTP_404_NOT_FOUND
+                    elif not check_password(password, user.get("password", "")):
+                        error = "Incorrect password"
+                        status_code = status.HTTP_401_UNAUTHORIZED
+                    else:
+                        cache.set(
+                            cache_key,
+                            user.get("password", ""),
+                            timeout=300,
+                        )
 
-        if not check_password(password, user.get("password", "")):
-            return Response(
-                {"password": "Incorrect password"},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+                        user_obj = type(
+                            "UserObj",
+                            (),
+                            {"id": str(user["_id"])},
+                        )()
+                        refresh = RefreshToken.for_user(user_obj)
 
-        cache.set(cache_key, user.get("password", ""), timeout=300)
+                        response_data = {
+                            "message": "Login successful (from DB)",
+                            "user": {
+                                "id": str(user["_id"]),
+                                "phone_number": user["phone_number"],
+                            },
+                            "refresh": str(refresh),
+                            "access": str(refresh.access_token),
+                        }
+                        status_code = status.HTTP_200_OK
 
-        user_obj = type("UserObj", (), {"id": str(user["_id"])})()
-        refresh = RefreshToken.for_user(user_obj)
+        if error:
+            return Response({"error": error}, status=status_code)
 
-        return Response(
-            {
-                "message": "Login successful (from DB)",
-                "user": {
-                    "id": str(user["_id"]),
-                    "phone_number": user["phone_number"],
-                },
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            },
-            status=status.HTTP_200_OK,
-        )
-
-        
+        return Response(response_data, status=status_code)
 
     def provide_otp(self, request):
         data = request.data

@@ -46,8 +46,10 @@ LOCALE_PATHS = [str(BASE_DIR / "locale")]
 # DATABASES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
+
 DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -320,3 +322,14 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    },
+}
+
+MONGO_URI = env("MONGO_URI")
+MONGO_COLLECTION_NAME = env("MONGO_COLLECTION_NAME")
+MONGO_DB_NAME = env("MONGO_DB_NAME")

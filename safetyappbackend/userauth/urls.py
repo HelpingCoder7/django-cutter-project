@@ -5,8 +5,8 @@ from rest_framework.routers import DefaultRouter
 from .views import AUTHVIEWSET
 
 router = DefaultRouter()
-router.register(r"auth", AUTHVIEWSET, basename="sign_up_view")
-router.register(r"login", AUTHVIEWSET, basename="provide_otp")
+router.register(r"auth", AUTHVIEWSET, basename="login_signup")
+router.register(r"otp", AUTHVIEWSET, basename="provide_otp")
 
 app_name = "userauth"
 

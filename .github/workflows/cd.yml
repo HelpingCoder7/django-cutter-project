@@ -26,4 +26,4 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       - name: Push image to dockerhub
-        run: docker push sudarshandevops/safetyappbackend:latest
+        run: docker compose -f docker-compose.local.yml push django 

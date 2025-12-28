@@ -42,13 +42,8 @@ class TestUserAuthViews:
         response = self.client.post(self.signup_url, data, format="json")
         message = "Phone number is already registered."
 
-        assert (
-            response.status_code 
-            == self.status_code_bad_request
-            )
-        assert (response.data["msg"]["phone_number"][0] 
-                == message
-                )
+        assert response.status_code == self.status_code_bad_request
+        assert response.data["msg"]["phone_number"][0] == message
 
     def test_signupview_without_phonenumber(self, db):
         data = {

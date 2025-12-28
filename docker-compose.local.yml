@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: ./compose/local/django/Dockerfile
-    image: safetyappbackend_local_django
+    image: sudarshandevops/safetyappbackend:latest
     container_name: safetyappbackend_local_django
     depends_on:
       - postgres

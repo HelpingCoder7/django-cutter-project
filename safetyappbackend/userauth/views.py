@@ -12,6 +12,11 @@ from .serializer import LoginSerializer
 from .serializer import SignupSerializer
 
 # Create your views here.
+# any_app/views.py
+from django.http import HttpResponse
+
+def healthz(request):
+    return HttpResponse("ok", status=200)
 
 
 class AUTHVIEWSET(viewsets.ViewSet):

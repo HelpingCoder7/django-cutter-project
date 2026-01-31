@@ -1,10 +1,12 @@
 import secrets
 
 from django.conf import settings
+from django.db import connection
 
 # Create your views here.
 # any_app/views.py
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -16,8 +18,18 @@ from .serializer import LoginSerializer
 from .serializer import SignupSerializer
 
 
+@csrf_exempt
 def healthz(request):
-    return HttpResponse("ok", status=200)
+    # Optional: check DB connection
+
+    try:
+        connection.ensure_connection()
+        db_status = True
+    except Exception(TimeoutError):
+        db_status = False
+
+    status = "ok" if db_status else "error"
+    return JsonResponse({"status": status})
 
 
 class AUTHVIEWSET(viewsets.ViewSet):

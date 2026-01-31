@@ -1,10 +1,12 @@
 import secrets
 
 from django.conf import settings
+from django.db import connection
 
 # Create your views here.
 # any_app/views.py
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -15,22 +17,19 @@ from twilio.rest import Client
 from .serializer import LoginSerializer
 from .serializer import SignupSerializer
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 @csrf_exempt
 def healthz(request):
     # Optional: check DB connection
-    from django.db import connection
+
     try:
         connection.ensure_connection()
         db_status = True
-    except Exception:
+    except Exception(TimeoutError):
         db_status = False
 
     status = "ok" if db_status else "error"
     return JsonResponse({"status": status})
-
 
 
 class AUTHVIEWSET(viewsets.ViewSet):

@@ -20,3 +20,5 @@ DATABASE_URL=postgresql://LOmqcwNaiiuvGLgFsYLjFsVtsmutUmDu:leaE7dEJI3Gtv6GTcu7Mi
 MONGO_URI=mongodb+srv://safetyapp:li7CIGUIiBZCJAvT@cluster0.nu2zdsi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 MONGO_DB_NAME=database
 MONGO_COLLECTION_NAME=logincollection
+
+DOCKER_HUB_USERNAME=sudarshandevop

@@ -1,6 +1,10 @@
 import secrets
 
 from django.conf import settings
+
+# Create your views here.
+# any_app/views.py
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -11,9 +15,6 @@ from twilio.rest import Client
 from .serializer import LoginSerializer
 from .serializer import SignupSerializer
 
-# Create your views here.
-# any_app/views.py
-from django.http import HttpResponse
 
 def healthz(request):
     return HttpResponse("ok", status=200)

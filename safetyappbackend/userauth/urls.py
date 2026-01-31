@@ -2,7 +2,7 @@ from django.urls import include
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-from .views import AUTHVIEWSET
+from .views import AUTHVIEWSET, healthz
 
 router = DefaultRouter()
 router.register(r"auth", AUTHVIEWSET, basename="login_signup")
@@ -12,4 +12,5 @@ app_name = "userauth"
 
 urlpatterns = [
     path("api/", include(router.urls)),
+    path("healthz/", healthz, name="healthz"),
 ]

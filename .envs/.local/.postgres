@@ -1,6 +1,6 @@
 # PostgreSQL
 # ------------------------------------------------------------------------------
-POSTGRES_HOST=postgres
+POSTGRES_HOST=  
 POSTGRES_PORT=5432
 POSTGRES_DB=safetyappbackend
 POSTGRES_USER=LOmqcwNaiiuvGLgFsYLjFsVtsmutUmDu

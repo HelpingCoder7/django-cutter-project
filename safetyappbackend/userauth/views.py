@@ -15,9 +15,22 @@ from twilio.rest import Client
 from .serializer import LoginSerializer
 from .serializer import SignupSerializer
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def healthz(request):
-    return HttpResponse("ok", status=200)
+    # Optional: check DB connection
+    from django.db import connection
+    try:
+        connection.ensure_connection()
+        db_status = True
+    except Exception:
+        db_status = False
+
+    status = "ok" if db_status else "error"
+    return JsonResponse({"status": status})
+
 
 
 class AUTHVIEWSET(viewsets.ViewSet):

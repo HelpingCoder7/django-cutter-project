@@ -49,9 +49,6 @@ COPY ./compose/production/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
-COPY ./compose/local/django/wait-for-it.sh /wait-for-it.sh
-RUN sed -i 's/\r$//g' /wait-for-it.sh
-RUN chmod +x /wait-for-it.sh
 
 COPY ./compose/local/django/start /start
 RUN sed -i 's/\r$//g' /start
